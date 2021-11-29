@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 
 from hat import json
 from hat import sbs
@@ -16,7 +17,9 @@ __all__ = ['task_clean_all',
            'task_check',
            'task_test',
            'task_docs',
-           'task_sbs']
+           'task_sbs',
+           'task_deps',
+           'task_format']
 
 
 build_dir = Path('build')
@@ -89,3 +92,18 @@ def task_sbs():
     return {'actions': [generate],
             'file_dep': src_paths,
             'targets': [sbs_repo_path]}
+
+
+def task_deps():
+    """Dependencies"""
+    return {'actions': [f'{sys.executable} -m peru sync']}
+
+
+def task_format():
+    """Format"""
+    files = [*Path('src_c').rglob('*.c'),
+             *Path('src_c').rglob('*.h')]
+    for f in files:
+        yield {'name': str(f),
+               'actions': [f'clang-format -style=file -i {f}'],
+               'file_dep': [f]}
