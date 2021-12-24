@@ -88,7 +88,7 @@ async def connect(sbs_repo: sbs.Repository,
     if url.scheme == 'tcp+sbs':
         ssl_ctx = None
     elif url.scheme == 'ssl+sbs':
-        ssl_ctx = _create_ssl_context(pem_file)
+        ssl_ctx = _create_ssl_context(pem_file, ssl.PROTOCOL_TLS_CLIENT)
     else:
         raise ValueError("Undefined protocol")
 
@@ -127,7 +127,7 @@ async def listen(sbs_repo: sbs.Repository,
     if url.scheme == 'tcp+sbs':
         ssl_ctx = None
     elif url.scheme == 'ssl+sbs':
-        ssl_ctx = _create_ssl_context(pem_file)
+        ssl_ctx = _create_ssl_context(pem_file, ssl.PROTOCOL_TLS_SERVER)
     else:
         raise ValueError("Undefined protocol")
 
@@ -423,8 +423,9 @@ def _sock_info_to_address(sock_info, scheme):
     return '{}://{}:{}'.format(scheme, host, port)
 
 
-def _create_ssl_context(pem_file):
-    ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS)
+def _create_ssl_context(pem_file, protocol):
+    ssl_ctx = ssl.SSLContext(protocol)
+    ssl_ctx.check_hostname = False
     ssl_ctx.verify_mode = ssl.VerifyMode.CERT_NONE
     if pem_file:
         ssl_ctx.load_cert_chain(pem_file)
