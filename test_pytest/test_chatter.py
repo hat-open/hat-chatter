@@ -7,9 +7,6 @@ from hat import chatter
 import pem
 
 
-pytestmark = pytest.mark.asyncio
-
-
 @pytest.fixture
 def pem_path(tmp_path):
     path = tmp_path / 'pem'
