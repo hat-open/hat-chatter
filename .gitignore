@@ -1,6 +1,7 @@
 /.doit.db
 /.peru
 /build
+/compile_flags.txt
 /deps
 /src_py/hat/chatter/sbs_repo.json
 /test_pytest/.coverage

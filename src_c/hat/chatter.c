@@ -1,4 +1,5 @@
 #include "chatter.h"
+#include <hat/sbs.h>
 
 
 typedef struct hat_chatter_conn_t {
@@ -22,7 +23,7 @@ typedef struct hat_chatter_conn_t {
 static void
 realloc_buff(hat_chatter_conn_t *conn, size_t size) {
     hat_buff_t *buff = &(conn->buff);
-    buff->data = hat_allocator_alloc(conn->alloc, size, buff->data);
+    buff->data = hat_allocator_realloc(conn->alloc, size, buff->data);
     buff->size = (buff->data ? size : 0);
 }
 
@@ -149,7 +150,6 @@ static int process_msg(hat_chatter_conn_t *conn, hat_chatter_msg_t *msg) {
 
 void hat_chatter_init(hat_chatter_conn_t *conn, void *ctx,
                       hat_allocator_t *alloc, uint64_t timestamp,
-                      hat_chatter_realloc_cb realloc_cb,
                       hat_chatter_msg_cb msg_cb, hat_chatter_write_cb write_cb,
                       hat_chatter_timeout_cb timeout_cb) {
     conn->ctx = ctx;

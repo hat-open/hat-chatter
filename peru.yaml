@@ -1,6 +1,14 @@
 imports:
     hat-util: deps/hat-util
+    hat-sbs: deps/hat-sbs
 
 git module hat-util:
     url: https://github.com/hat-open/hat-util
+    rev: 7f56bb0572aee5a33654118838f999eec04fbd86
     pick: src_c/hat
+
+git module hat-sbs:
+    url: https://github.com/hat-open/hat-sbs
+    rev: 959b6534b8ef1385c451f1d2962ef9adfcf828e5
+    pick: src_c/hat
+    recursive: false
