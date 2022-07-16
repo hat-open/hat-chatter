@@ -50,8 +50,7 @@ def task_build():
             name='hat-chatter',
             description='Hat Chatter protocol',
             url='https://github.com/hat-open/hat-chatter',
-            license=common.License.APACHE2,
-            packages=['hat'])
+            license=common.License.APACHE2)
 
     return {'actions': [build],
             'task_dep': ['sbs']}

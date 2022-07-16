@@ -8,8 +8,8 @@ services).
 
 """
 
-from pathlib import Path
 import asyncio
+import importlib.resources
 import logging
 import math
 import ssl
@@ -23,9 +23,9 @@ from hat import sbs
 mlog: logging.Logger = logging.getLogger(__name__)
 """Module logger"""
 
-sbs_repo: sbs.Repository = sbs.Repository.from_json(Path(__file__).parent /
-                                                    'sbs_repo.json')
-"""Chatter message definition SBS repository"""
+with importlib.resources.path(__package__, 'sbs_repo.json') as _path:
+    sbs_repo: sbs.Repository = sbs.Repository.from_json(_path)
+    """Chatter message definition SBS repository"""
 
 
 class Data(typing.NamedTuple):
