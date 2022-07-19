@@ -4,12 +4,12 @@ import sys
 from hat import json
 from hat import sbs
 from hat.doit import common
+from hat.doit.c import get_task_clang_format
+from hat.doit.docs import (build_sphinx,
+                           build_pdoc)
 from hat.doit.py import (build_wheel,
                          run_pytest,
                          run_flake8)
-from hat.doit.docs import (SphinxOutputType,
-                           build_sphinx,
-                           build_pdoc)
 
 
 __all__ = ['task_clean_all',
@@ -71,11 +71,15 @@ def task_test():
 
 def task_docs():
     """Docs"""
-    return {'actions': [(build_sphinx, [SphinxOutputType.HTML,
-                                        docs_dir,
-                                        build_docs_dir]),
-                        (build_pdoc, ['hat.chatter',
-                                      build_docs_dir / 'py_api'])],
+
+    def build():
+        build_sphinx(src_dir=docs_dir,
+                     dst_dir=build_docs_dir,
+                     project='hat-chatter')
+        build_pdoc(module='hat.chatter',
+                   dst_dir=build_docs_dir / 'py_api')
+
+    return {'actions': [build],
             'task_dep': ['sbs']}
 
 
@@ -100,9 +104,5 @@ def task_deps():
 
 def task_format():
     """Format"""
-    files = [*Path('src_c').rglob('*.c'),
-             *Path('src_c').rglob('*.h')]
-    for f in files:
-        yield {'name': str(f),
-               'actions': [f'clang-format -style=file -i {f}'],
-               'file_dep': [f]}
+    yield from get_task_clang_format([*Path('src_c').rglob('*.c'),
+                                      *Path('src_c').rglob('*.h')])
