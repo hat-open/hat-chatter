@@ -273,7 +273,7 @@ class Connection(aio.Resource):
                'owner': conv.owner if conv else True,
                'token': token,
                'last': last,
-               'data': {'module': _value_to_sbs_maybe(msg_data.module),
+               'data': {'module': _value_to_sbs_optional(msg_data.module),
                         'type': msg_data.type,
                         'data': self._sbs_repo.encode(msg_data.module,
                                                       msg_data.type,
@@ -432,8 +432,8 @@ def _create_ssl_context(pem_file, protocol):
     return ssl_ctx
 
 
-def _value_to_sbs_maybe(value):
-    return ('Just', value) if value is not None else ('Nothing', None)
+def _value_to_sbs_optional(value):
+    return ('value', value) if value is not None else ('none', None)
 
 
 def _uint_to_bebytes(x):

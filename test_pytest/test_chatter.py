@@ -35,7 +35,7 @@ async def test_sbs_repo(sbs_repo):
            'owner': True,
            'token': False,
            'last': True,
-           'data': {'module': ('Just', 'Test'),
+           'data': {'module': ('value', 'Test'),
                     'type': 'Data',
                     'data': encoded_data}}
     encoded_msg = sbs_repo.encode('Hat', 'Msg', msg)
