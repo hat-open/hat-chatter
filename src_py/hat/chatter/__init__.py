@@ -103,7 +103,7 @@ async def connect(sbs_repo: sbs.Repository,
 
 async def listen(sbs_repo: sbs.Repository,
                  address: str,
-                 connection_cb: typing.Callable[['Connection'], None],
+                 connection_cb: aio.AsyncCallable[['Connection'], None],
                  *,
                  pem_file: typing.Optional[str] = None,
                  ping_timeout: float = 20,
@@ -136,13 +136,13 @@ async def listen(sbs_repo: sbs.Repository,
     server._connection_cb = connection_cb
     server._ping_timeout = ping_timeout
     server._queue_maxsize = queue_maxsize
+    server._async_group = aio.Group()
 
     server._srv = await asyncio.start_server(server._on_connected,
                                              url.hostname, url.port,
                                              ssl=ssl_ctx)
 
     mlog.debug("listening socket created")
-    server._async_group = aio.Group()
     server._async_group.spawn(aio.call_on_cancel, server._on_close)
     server._addresses = [_sock_info_to_address(socket.getsockname(),
                                                url.scheme)
@@ -176,11 +176,16 @@ class Server(aio.Resource):
 
     def _on_connected(self, reader, writer):
         mlog.debug("server accepted new connection")
-        transport = _TcpTransport(self._sbs_repo, reader, writer)
-        conn = _create_connection(self._sbs_repo, transport,
-                                  self._ping_timeout, self._queue_maxsize,
-                                  self._async_group)
-        self._connection_cb(conn)
+        try:
+            transport = _TcpTransport(self._sbs_repo, reader, writer)
+            conn = _create_connection(self._sbs_repo, transport,
+                                      self._ping_timeout, self._queue_maxsize,
+                                      self._async_group)
+            self.async_group.spawn(aio.call, self._connection_cb, conn)
+
+        except Exception as e:
+            mlog.error("create connection error: %s", e, exc_info=e)
+            writer.close()
 
 
 def _create_connection(sbs_repo, transport, ping_timeout, queue_maxsize,
