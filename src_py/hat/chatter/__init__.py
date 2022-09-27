@@ -310,6 +310,14 @@ class Connection(aio.Resource):
 
         return conv
 
+    async def drain(self):
+        """Drain stream writer
+
+        See `asyncio.StreamWriter.drain`.
+
+        """
+        await self._transport.drain()
+
     async def _read_loop(self):
         mlog.debug("connection's read loop started")
         try:
@@ -415,6 +423,9 @@ class _TcpTransport:
         msg_len_bytes = _uint_to_bebytes(msg_len)
         msg_len_len_bytes = bytes([len(msg_len_bytes)])
         self._writer.write(msg_len_len_bytes + msg_len_bytes + msg_bytes)
+
+    async def drain(self):
+        await self._writer.drain()
 
     async def async_close(self):
         self._writer.close()
