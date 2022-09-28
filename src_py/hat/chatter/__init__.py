@@ -107,7 +107,8 @@ async def listen(sbs_repo: sbs.Repository,
                  *,
                  pem_file: typing.Optional[str] = None,
                  ping_timeout: float = 20,
-                 queue_maxsize: int = 0
+                 queue_maxsize: int = 0,
+                 bind_connections: bool = True
                  ) -> 'Server':
     """Create listening server.
 
@@ -137,6 +138,7 @@ async def listen(sbs_repo: sbs.Repository,
     server._ping_timeout = ping_timeout
     server._queue_maxsize = queue_maxsize
     server._async_group = aio.Group()
+    server._bind_connections = bind_connections
 
     server._srv = await asyncio.start_server(server._on_connected,
                                              url.hostname, url.port,
@@ -178,9 +180,11 @@ class Server(aio.Resource):
         mlog.debug("server accepted new connection")
         try:
             transport = _TcpTransport(self._sbs_repo, reader, writer)
+            parent_group = (self._async_group
+                            if self._bind_connections else None)
             conn = _create_connection(self._sbs_repo, transport,
                                       self._ping_timeout, self._queue_maxsize,
-                                      self._async_group)
+                                      parent_group)
             self.async_group.spawn(aio.call, self._connection_cb, conn)
 
         except Exception as e:
