@@ -9,6 +9,7 @@ services).
 """
 
 import asyncio
+import contextlib
 import importlib.resources
 import logging
 import math
@@ -433,7 +434,8 @@ class _TcpTransport:
 
     async def async_close(self):
         self._writer.close()
-        await self._writer.wait_closed()
+        with contextlib.suppress(Exception):
+            await self._writer.wait_closed()
 
 
 def _sock_info_to_address(sock_info, scheme):
