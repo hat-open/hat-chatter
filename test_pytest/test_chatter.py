@@ -1,16 +1,22 @@
 import asyncio
+import subprocess
 
 import pytest
 
 from hat import sbs
 from hat import chatter
-import pem
 
 
 @pytest.fixture
 def pem_path(tmp_path):
     path = tmp_path / 'pem'
-    pem.create_pem_file(path)
+    subprocess.run(['openssl', 'req', '-batch', '-x509', '-noenc',
+                    '-newkey', 'rsa:2048',
+                    '-days', '1',
+                    '-keyout', str(path),
+                    '-out', str(path)],
+                   stderr=subprocess.DEVNULL,
+                   check=True)
     return path
 
 
