@@ -24,13 +24,14 @@ from hat import sbs
 mlog: logging.Logger = logging.getLogger(__name__)
 """Module logger"""
 
-with importlib.resources.path(__package__, 'sbs_repo.json') as _path:
+with importlib.resources.as_file(importlib.resources.files(__package__) /
+                                 'sbs_repo.json') as _path:
     sbs_repo: sbs.Repository = sbs.Repository.from_json(_path)
     """Chatter message definition SBS repository"""
 
 
 class Data(typing.NamedTuple):
-    module: typing.Optional[str]
+    module: str | None
     """SBS module name"""
     type: str
     """SBS type name"""
@@ -54,7 +55,7 @@ class Msg(typing.NamedTuple):
 async def connect(sbs_repo: sbs.Repository,
                   address: str,
                   *,
-                  pem_file: typing.Optional[str] = None,
+                  pem_file: str | None = None,
                   ping_timeout: float = 20,
                   queue_maxsize: int = 0
                   ) -> 'Connection':
@@ -106,7 +107,7 @@ async def listen(sbs_repo: sbs.Repository,
                  address: str,
                  connection_cb: aio.AsyncCallable[['Connection'], None],
                  *,
-                 pem_file: typing.Optional[str] = None,
+                 pem_file: str | None = None,
                  ping_timeout: float = 20,
                  queue_maxsize: int = 0,
                  bind_connections: bool = True
@@ -169,7 +170,7 @@ class Server(aio.Resource):
         return self._async_group
 
     @property
-    def addresses(self) -> typing.List[str]:
+    def addresses(self) -> list[str]:
         """Listening addresses"""
         return self._addresses
 
@@ -252,12 +253,11 @@ class Connection(aio.Resource):
     def send(self,
              msg_data: Data,
              *,
-             conv: typing.Optional[Conversation] = None,
+             conv: Conversation | None = None,
              last: bool = True,
              token: bool = True,
-             timeout: typing.Optional[float] = None,
-             timeout_cb: typing.Optional[typing.Callable[[Conversation],
-                                                         None]] = None
+             timeout: float | None = None,
+             timeout_cb: typing.Callable[[Conversation], None] | None = None
              ) -> Conversation:
         """Send message
 

@@ -2,7 +2,7 @@
 /.peru
 /build
 /compile_flags.txt
-/deps
+/peru
 /src_py/hat/chatter/sbs_repo.json
 /test_pytest/.coverage
 __pycache__

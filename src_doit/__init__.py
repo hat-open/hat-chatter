@@ -18,7 +18,7 @@ __all__ = ['task_clean_all',
            'task_test',
            'task_docs',
            'task_sbs',
-           'task_deps',
+           'task_peru',
            'task_format']
 
 
@@ -97,8 +97,8 @@ def task_sbs():
             'targets': [sbs_repo_path]}
 
 
-def task_deps():
-    """Dependencies"""
+def task_peru():
+    """Paru"""
     return {'actions': [f'{sys.executable} -m peru sync']}
 
 
