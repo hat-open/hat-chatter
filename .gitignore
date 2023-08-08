@@ -4,5 +4,4 @@
 /compile_flags.txt
 /peru
 /src_py/hat/chatter/sbs_repo.json
-/test_pytest/.coverage
 __pycache__
